@@ -104,9 +104,6 @@ class Plugin {
      * Register public hooks.
      */
     private function define_public_hooks() {
-        // Enqueue public scripts and styles if needed
-        add_action('wp_enqueue_scripts', [$this, 'enqueue_public_scripts']);
-        
         // Instantiate Frontend Shortcodes & Widgets
         new \AllureClinics\Frontend\ShortcodeBookingWidget();
         new \AllureClinics\Frontend\ShortcodeLeadForm();
