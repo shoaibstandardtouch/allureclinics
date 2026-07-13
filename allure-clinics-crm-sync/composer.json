@@ -1,0 +1,13 @@
+{
+    "name": "standardtouch/allure-clinics-crm-sync",
+    "description": "CRM Sync and patient booking portal for Allure Clinics",
+    "type": "wordpress-plugin",
+    "require": {
+        "php": ">=8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "AllureClinics\\": "src/"
+        }
+    }
+}
