@@ -40,7 +40,7 @@ class Plugin {
      */
     private function init_services() {
         // Auth / SMS
-        $smsProvider = new \AllureClinics\Auth\LogOnlySmsProvider();
+        $smsProvider = \AllureClinics\Auth\SmsProviderFactory::create();
         $otpService = new \AllureClinics\Auth\OtpService($smsProvider);
         $patientSession = new \AllureClinics\Auth\PatientSession();
 
