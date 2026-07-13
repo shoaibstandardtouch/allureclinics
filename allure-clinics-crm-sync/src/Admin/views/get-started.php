@@ -8,6 +8,7 @@
         <form method="post" action="" style="margin-bottom: 20px;">
             <?php wp_nonce_field('demo_action', 'allure_clinics_demo_nonce'); ?>
             <input type="submit" name="load_demo_data" class="button button-primary" value="<?php esc_attr_e('Load Demo Data', 'allure-clinics'); ?>">
+            <input type="submit" name="create_demo_pages" class="button" value="<?php esc_attr_e('Create Demo Pages', 'allure-clinics'); ?>">
             <input type="submit" name="clear_demo_data" class="button" value="<?php esc_attr_e('Clear Demo Data', 'allure-clinics'); ?>" onclick="return confirm('<?php esc_attr_e('Are you sure you want to delete all local demo data?', 'allure-clinics'); ?>');">
         </form>
     </div>

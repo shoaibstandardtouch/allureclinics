@@ -11,19 +11,23 @@ class ShortcodeBookingWidget {
     public function render($atts) {
         ob_start();
         ?>
-        <div class="ac-booking-widget" style="max-width: 800px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; font-family: sans-serif;">
+        <div class="ac-premium-widget" style="max-width: 800px; margin: 40px auto; background: #ffffff; border-radius: 20px; box-shadow: 0 12px 40px rgba(0,0,0,0.08); overflow: hidden; font-family: 'Outfit', 'Inter', sans-serif;">
             
-            <div style="background: #2271b1; color: #fff; padding: 20px; text-align: center;">
-                <h2 style="margin: 0; color: #fff;"><?php esc_html_e('Book an Appointment', 'allure-clinics'); ?></h2>
+            <!-- Branding Header -->
+            <div style="background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); padding: 30px 20px; text-align: center; border-bottom: 1px solid #eaeaea;">
+                <img src="https://shoaib.standardtouch.com/allureclinics/wp-content/uploads/2026/07/allure-logo-1.png" alt="Allure Clinics Logo" style="max-height: 70px; margin-bottom: 10px; display: inline-block;">
+                <h2 style="margin: 0; color: #2c3e50; font-weight: 600; font-size: 28px; letter-spacing: -0.5px;">Allure Clinics</h2>
+                <p style="margin: 5px 0 0 0; color: #7f8c8d; font-size: 15px;"><?php esc_html_e('Book your consultation', 'allure-clinics'); ?></p>
             </div>
 
-            <div style="padding: 20px;">
+            <div style="padding: 40px 30px;">
                 <!-- Step 1: Branch & Doctor -->
-                <div id="ac_step_1">
-                    <h3 style="margin-top:0;"><?php esc_html_e('1. Select Provider', 'allure-clinics'); ?></h3>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; font-weight: bold; margin-bottom: 5px;"><?php esc_html_e('Select Branch', 'allure-clinics'); ?></label>
-                        <select id="ac_branch_select" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                <div id="ac_step_1" class="ac-step-container">
+                    <h3 style="margin-top:0; color: #2c3e50; font-weight: 600; font-size: 20px; border-bottom: 2px solid #5ab0a9; padding-bottom: 10px; display: inline-block;"><?php esc_html_e('1. Select Provider', 'allure-clinics'); ?></h3>
+                    
+                    <div style="margin-bottom: 25px; margin-top: 15px;">
+                        <label style="display: block; font-weight: 500; color: #34495e; margin-bottom: 8px;"><?php esc_html_e('Choose Branch', 'allure-clinics'); ?></label>
+                        <select id="ac_branch_select" class="ac-input-premium">
                             <option value=""><?php esc_html_e('Loading branches...', 'allure-clinics'); ?></option>
                         </select>
                     </div>
@@ -34,11 +38,11 @@ class ShortcodeBookingWidget {
                 </div>
 
                 <!-- Step 2: Date & Slot -->
-                <div id="ac_step_2" style="display:none;">
-                    <button class="ac-back-btn" data-target="ac_step_1" style="background:none; border:none; color:#2271b1; cursor:pointer; padding:0; margin-bottom:15px; text-decoration:underline;">&larr; <?php esc_html_e('Back to Providers', 'allure-clinics'); ?></button>
-                    <h3 style="margin-top:0;"><?php esc_html_e('2. Select Time', 'allure-clinics'); ?></h3>
+                <div id="ac_step_2" class="ac-step-container" style="display:none;">
+                    <button class="ac-back-btn" data-target="ac_step_1" style="background:none; border:none; color:#5ab0a9; cursor:pointer; padding:0; margin-bottom:20px; font-weight: 500; font-size: 15px; transition: color 0.2s;">&larr; <?php esc_html_e('Back to Providers', 'allure-clinics'); ?></button>
+                    <h3 style="margin-top:0; color: #2c3e50; font-weight: 600; font-size: 20px; border-bottom: 2px solid #5ab0a9; padding-bottom: 10px; display: inline-block;"><?php esc_html_e('2. Select Time', 'allure-clinics'); ?></h3>
                     
-                    <div style="display:flex; align-items:center; gap: 15px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                    <div style="display:flex; align-items:center; gap: 20px; margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 12px; border: 1px solid #edf2f7;">
                         <img id="ac_selected_doc_photo" src="" style="width: 60px; height: 60px; border-radius: 50%; object-fit:cover;">
                         <div>
                             <strong style="font-size: 18px;" id="ac_selected_doc_name"></strong><br>
@@ -46,72 +50,91 @@ class ShortcodeBookingWidget {
                         </div>
                     </div>
 
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; font-weight: bold; margin-bottom: 5px;"><?php esc_html_e('Select Date', 'allure-clinics'); ?></label>
-                        <input type="date" id="ac_date_select" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: block; font-weight: 500; color: #34495e; margin-bottom: 8px;"><?php esc_html_e('Select Date', 'allure-clinics'); ?></label>
+                        <input type="date" id="ac_date_select" class="ac-input-premium">
                     </div>
 
-                    <div id="ac_slot_list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-bottom: 20px;">
+                    <div id="ac_slot_list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; margin-bottom: 20px;">
                         <!-- Slots injected here -->
                     </div>
                 </div>
 
                 <!-- Step 3: Patient Details & OTP -->
-                <div id="ac_step_3" style="display:none;">
-                    <button class="ac-back-btn" data-target="ac_step_2" style="background:none; border:none; color:#2271b1; cursor:pointer; padding:0; margin-bottom:15px; text-decoration:underline;">&larr; <?php esc_html_e('Back to Time Selection', 'allure-clinics'); ?></button>
-                    <h3 style="margin-top:0;"><?php esc_html_e('3. Your Details', 'allure-clinics'); ?></h3>
+                <div id="ac_step_3" class="ac-step-container" style="display:none;">
+                    <button class="ac-back-btn" data-target="ac_step_2" style="background:none; border:none; color:#5ab0a9; cursor:pointer; padding:0; margin-bottom:20px; font-weight: 500; font-size: 15px; transition: color 0.2s;">&larr; <?php esc_html_e('Back to Time Selection', 'allure-clinics'); ?></button>
+                    <h3 style="margin-top:0; color: #2c3e50; font-weight: 600; font-size: 20px; border-bottom: 2px solid #5ab0a9; padding-bottom: 10px; display: inline-block;"><?php esc_html_e('3. Your Details', 'allure-clinics'); ?></h3>
                     
-                    <div style="background: #f9f9f9; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
-                        <strong><?php esc_html_e('Appointment Summary', 'allure-clinics'); ?></strong><br>
-                        <span id="ac_summary_doc"></span><br>
-                        <span id="ac_summary_time" style="color:#2271b1; font-weight:bold;"></span>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 1px solid #edf2f7; text-align: center;">
+                        <strong style="color: #7f8c8d; font-weight: 500; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;"><?php esc_html_e('Appointment Summary', 'allure-clinics'); ?></strong><br>
+                        <span id="ac_summary_doc" style="font-size: 18px; color: #2c3e50; font-weight: 600; display: block; margin-top: 5px;"></span>
+                        <span id="ac_summary_time" style="color:#5ab0a9; font-weight:600; font-size: 16px;"></span>
                     </div>
 
                     <div id="ac_booking_form_wrapper">
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; font-weight: bold; margin-bottom: 5px;"><?php esc_html_e('Full Name', 'allure-clinics'); ?></label>
-                            <input type="text" id="ac_patient_name" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; font-weight: 500; color: #34495e; margin-bottom: 8px;"><?php esc_html_e('Full Name', 'allure-clinics'); ?></label>
+                            <input type="text" id="ac_patient_name" class="ac-input-premium">
                         </div>
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; font-weight: bold; margin-bottom: 5px;"><?php esc_html_e('Mobile Number', 'allure-clinics'); ?></label>
-                            <input type="tel" id="ac_patient_mobile" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" placeholder="+966500000000">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; font-weight: 500; color: #34495e; margin-bottom: 8px;"><?php esc_html_e('Mobile Number', 'allure-clinics'); ?></label>
+                            <input type="tel" id="ac_patient_mobile" class="ac-input-premium" placeholder="+966500000000">
                         </div>
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; font-weight: bold; margin-bottom: 5px;"><?php esc_html_e('Email (Optional)', 'allure-clinics'); ?></label>
-                            <input type="email" id="ac_patient_email" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                        <div style="margin-bottom: 25px;">
+                            <label style="display: block; font-weight: 500; color: #34495e; margin-bottom: 8px;"><?php esc_html_e('Email (Optional)', 'allure-clinics'); ?></label>
+                            <input type="email" id="ac_patient_email" class="ac-input-premium">
                         </div>
-                        <button id="ac_btn_request_otp" style="width: 100%; padding: 12px; background: #2271b1; color: #fff; border: none; border-radius: 4px; font-size: 16px; cursor: pointer;">
+                        <button id="ac_btn_request_otp" class="ac-btn-premium">
                             <?php esc_html_e('Continue to Verification', 'allure-clinics'); ?>
                         </button>
                     </div>
 
                     <div id="ac_otp_wrapper" style="display:none; text-align:center;">
-                        <p style="color:#007017; font-weight:bold;" id="ac_otp_sent_msg"></p>
-                        <input type="text" id="ac_otp_code" style="width: 100%; max-width:200px; padding: 12px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 15px; text-align:center; letter-spacing: 5px; font-size: 18px;" placeholder="123456" maxlength="6">
-                        <button id="ac_btn_confirm_booking" style="width: 100%; padding: 12px; background: #007017; color: #fff; border: none; border-radius: 4px; font-size: 16px; cursor: pointer;">
+                        <p style="color:#27ae60; font-weight:600; margin-bottom: 20px; font-size: 15px;" id="ac_otp_sent_msg"></p>
+                        <input type="text" id="ac_otp_code" class="ac-input-premium" style="max-width:250px; margin: 0 auto 20px auto; text-align:center; letter-spacing: 8px; font-size: 22px; font-weight: 600;" placeholder="123456" maxlength="6">
+                        <button id="ac_btn_confirm_booking" class="ac-btn-premium">
                             <?php esc_html_e('Confirm Booking', 'allure-clinics'); ?>
                         </button>
                     </div>
                 </div>
 
                 <!-- Step 4: Success -->
-                <div id="ac_step_4" style="display:none; text-align:center; padding: 40px 20px;">
-                    <div style="width: 80px; height: 80px; background: #007017; color:#fff; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:40px; margin-bottom: 20px;">&check;</div>
-                    <h2 style="color:#007017;"><?php esc_html_e('Booking Confirmed!', 'allure-clinics'); ?></h2>
-                    <p><?php esc_html_e('Thank you for choosing Allure Clinics. A confirmation email has been sent to you.', 'allure-clinics'); ?></p>
-                    <p id="ac_final_summary" style="font-weight:bold; background:#f9f9f9; padding:15px; border-radius:4px; display:inline-block;"></p>
+                <div id="ac_step_4" class="ac-step-container" style="display:none; text-align:center; padding: 40px 20px;">
+                    <div style="width: 90px; height: 90px; background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color:#fff; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:45px; margin-bottom: 25px; box-shadow: 0 10px 20px rgba(46,204,113,0.3);">&check;</div>
+                    <h2 style="color:#27ae60; font-weight: 600; font-size: 28px; margin-bottom: 10px;"><?php esc_html_e('Booking Confirmed!', 'allure-clinics'); ?></h2>
+                    <p style="color: #7f8c8d; font-size: 16px; margin-bottom: 30px;"><?php esc_html_e('Thank you for choosing Allure Clinics. A confirmation email has been sent to you.', 'allure-clinics'); ?></p>
+                    <div id="ac_final_summary" style="font-weight:600; background:#f8f9fa; color: #2c3e50; padding:20px; border-radius:12px; display:inline-block; border: 1px solid #edf2f7; font-size: 18px;"></div>
                 </div>
 
-                <div id="ac_global_msg" style="display:none; margin-top: 15px; padding: 10px; border-radius: 4px;"></div>
+                <div id="ac_global_msg" style="display:none; margin-top: 20px; padding: 15px; border-radius: 8px; font-weight: 500; text-align: center;"></div>
             </div>
         </div>
 
+        <!-- Preconnect to Google Fonts for premium typography -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
         <style>
-            .ac-doc-card { border: 1px solid #eee; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; transition: all 0.2s; }
-            .ac-doc-card:hover { border-color: #2271b1; box-shadow: 0 4px 8px rgba(34,113,177,0.1); transform: translateY(-2px); }
-            .ac-slot-btn { padding: 10px; background: #f0f6fc; border: 1px solid #c8dcf0; color: #2271b1; border-radius: 4px; cursor: pointer; text-align:center; font-weight:bold; }
-            .ac-slot-btn:hover { background: #2271b1; color: #fff; }
-            .ac-slot-btn.selected { background: #2271b1; color: #fff; border-color: #2271b1; box-shadow: 0 0 0 2px rgba(34,113,177,0.3); }
+            .ac-input-premium { width: 100%; padding: 14px 16px; border: 1px solid #dcdde1; border-radius: 10px; font-size: 16px; font-family: inherit; color: #2c3e50; transition: all 0.3s; background: #fff; box-sizing: border-box; }
+            .ac-input-premium:focus { border-color: #5ab0a9; outline: none; box-shadow: 0 0 0 4px rgba(90,176,169,0.15); }
+            
+            .ac-btn-premium { width: 100%; padding: 15px; background: linear-gradient(135deg, #5ab0a9 0%, #469a93 100%); color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: inherit; box-shadow: 0 4px 15px rgba(90,176,169,0.3); }
+            .ac-btn-premium:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(90,176,169,0.4); }
+            .ac-btn-premium:disabled { background: #bdc3c7; box-shadow: none; cursor: not-allowed; transform: none; }
+
+            .ac-doc-card { background: #fff; border: 1px solid #edf2f7; border-radius: 16px; padding: 25px 20px; text-align: center; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+            .ac-doc-card:hover { border-color: #5ab0a9; box-shadow: 0 10px 25px rgba(90,176,169,0.15); transform: translateY(-5px); }
+            .ac-doc-card img { border: 3px solid #fdfbfb; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+            
+            .ac-slot-btn { padding: 12px; background: #fdfbfb; border: 1px solid #edf2f7; color: #2c3e50; border-radius: 10px; cursor: pointer; text-align:center; font-weight:600; transition: all 0.2s; font-size: 15px; }
+            .ac-slot-btn:hover { background: #f0f7f7; border-color: #5ab0a9; color: #5ab0a9; }
+            .ac-slot-btn.selected { background: #5ab0a9; color: #fff; border-color: #5ab0a9; box-shadow: 0 4px 12px rgba(90,176,169,0.3); }
+            
+            .ac-step-container { animation: acFadeIn 0.4s ease-out forwards; }
+            @keyframes acFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+            
+            .ac-back-btn:hover { color: #469a93; }
         </style>
 
         <script>
@@ -205,10 +228,10 @@ class ShortcodeBookingWidget {
                     const div = document.createElement('div');
                     div.className = 'ac-doc-card';
                     div.innerHTML = `
-                        <img src="${photo}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom:10px;">
-                        <h4 style="margin:0 0 5px 0;">Dr. ${doc.name}</h4>
-                        <div style="font-size:12px; color:#666; margin-bottom:10px;">${specs}</div>
-                        <button class="button" style="width:100%;"><?php esc_html_e('Select', 'allure-clinics'); ?></button>
+                        <img src="${photo}" style="width:90px; height:90px; border-radius:50%; object-fit:cover; margin-bottom:15px;">
+                        <h4 style="margin:0 0 8px 0; color: #2c3e50; font-size: 18px; font-weight: 600;">Dr. ${doc.name}</h4>
+                        <div style="font-size:13px; color:#7f8c8d; margin-bottom:15px; line-height: 1.4;">${specs}</div>
+                        <button class="ac-btn-premium" style="padding: 10px; font-size: 14px;"><?php esc_html_e('Select Provider', 'allure-clinics'); ?></button>
                     `;
                     div.addEventListener('click', () => selectDoctor(doc));
                     dom.doctorList.appendChild(div);
