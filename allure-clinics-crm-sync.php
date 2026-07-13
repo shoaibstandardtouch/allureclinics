@@ -18,10 +18,31 @@ define( 'ALLURE_CLINICS_VERSION', '1.0.0' );
 define( 'ALLURE_CLINICS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ALLURE_CLINICS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
-// Require Composer autoloader
-if ( file_exists( ALLURE_CLINICS_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
-    require_once ALLURE_CLINICS_PLUGIN_DIR . 'vendor/autoload.php';
-}
+// Native Autoloader (PSR-4 compliant)
+spl_autoload_register(function ($class) {
+    // The project's namespace prefix
+    $prefix = 'AllureClinics\\';
+    // Base directory for the namespace prefix
+    $base_dir = ALLURE_CLINICS_PLUGIN_DIR . 'src/';
+
+    // Does the class use the namespace prefix?
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
+        return; // no, move to the next registered autoloader
+    }
+
+    // Get the relative class name
+    $relative_class = substr($class, $len);
+    // Replace the namespace prefix with the base directory, replace namespace
+    // separators with directory separators in the relative class name, append
+    // with .php
+    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+
+    // If the file exists, require it
+    if (file_exists($file)) {
+        require $file;
+    }
+});
 
 // The core plugin class that is used to define internationalization,
 // admin-specific hooks, and public-facing site hooks.
