@@ -24,8 +24,7 @@
                                     <span style="color:#777;"><?php echo esc_html($branch['name_ar']); ?></span>
                                 </td>
                                 <td>
-                                    <?php echo esc_html($branch['address']); ?><br>
-                                    <span style="color:#777;"><?php echo esc_html($branch['address_ar']); ?></span>
+                                    <?php echo esc_html($branch['address']); ?>
                                 </td>
                                 <td><?php echo esc_html($branch['phone']); ?></td>
                                 <td>
@@ -68,12 +67,8 @@
                     <input type="text" name="name_ar" class="regular-text" style="width:100%;">
                 </p>
                 <p>
-                    <label><?php esc_html_e('Address (English)', 'allure-clinics'); ?></label><br>
+                    <label><?php esc_html_e('Address', 'allure-clinics'); ?></label><br>
                     <textarea name="address" rows="2" style="width:100%;"></textarea>
-                </p>
-                <p>
-                    <label><?php esc_html_e('Address (Arabic)', 'allure-clinics'); ?></label><br>
-                    <textarea name="address_ar" rows="2" style="width:100%;"></textarea>
                 </p>
                 <p>
                     <label><?php esc_html_e('Phone', 'allure-clinics'); ?></label><br>

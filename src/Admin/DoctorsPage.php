@@ -32,8 +32,7 @@ class DoctorsPage {
                     'bio_ar' => sanitize_textarea_field($_POST['bio_ar']),
                     'specialties' => wp_json_encode($specialties),
                     'qualifications' => wp_json_encode($qualifications),
-                    'years_experience' => absint($_POST['years_experience']),
-                    'photo_url' => esc_url_raw($_POST['photo_url'])
+                    'years_experience' => absint($_POST['years_experience'])
                 ];
 
                 if (!empty($_POST['doctor_id'])) {

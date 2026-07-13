@@ -22,7 +22,6 @@ class BranchesPage {
                     'name' => sanitize_text_field($_POST['name']),
                     'name_ar' => sanitize_text_field($_POST['name_ar']),
                     'address' => sanitize_text_field($_POST['address']),
-                    'address_ar' => sanitize_text_field($_POST['address_ar']),
                     'phone' => sanitize_text_field($_POST['phone']),
                 ];
 

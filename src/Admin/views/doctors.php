@@ -23,11 +23,7 @@
                             <?php $specialties = implode(', ', json_decode($doctor['specialties'], true) ?? []); ?>
                             <tr>
                                 <td>
-                                    <?php if (!empty($doctor['photo_url'])) : ?>
-                                        <img src="<?php echo esc_url($doctor['photo_url']); ?>" width="50" height="50" style="border-radius:50%; object-fit:cover;">
-                                    <?php else : ?>
-                                        <div style="width:50px; height:50px; background:#eee; border-radius:50%;"></div>
-                                    <?php endif; ?>
+                                    <div style="width:50px; height:50px; background:#eee; border-radius:50%;"></div>
                                 </td>
                                 <td>
                                     <strong><?php echo esc_html($doctor['name']); ?></strong><br>
@@ -103,10 +99,6 @@
                 <p>
                     <label><?php esc_html_e('Years Experience', 'allure-clinics'); ?></label><br>
                     <input type="number" name="years_experience" class="regular-text" style="width:100%;" min="0">
-                </p>
-                <p>
-                    <label><?php esc_html_e('Photo URL', 'allure-clinics'); ?></label><br>
-                    <input type="url" name="photo_url" class="regular-text" style="width:100%;">
                 </p>
                 
                 <?php submit_button(__('Save Doctor', 'allure-clinics')); ?>
