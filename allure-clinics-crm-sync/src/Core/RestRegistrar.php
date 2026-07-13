@@ -6,6 +6,7 @@ use AllureClinics\Rest\AppointmentsController;
 use AllureClinics\Rest\DoctorsController;
 use AllureClinics\Rest\PatientAuthController;
 use AllureClinics\Rest\PatientPortalController;
+use AllureClinics\Rest\LeadsController;
 use AllureClinics\CRM\WebhookController;
 
 class RestRegistrar {
@@ -14,6 +15,7 @@ class RestRegistrar {
     private DoctorsController $doctorsController;
     private PatientAuthController $authController;
     private PatientPortalController $portalController;
+    private LeadsController $leadsController;
     private WebhookController $webhookController;
 
     public function __construct(
@@ -21,12 +23,14 @@ class RestRegistrar {
         DoctorsController $doctorsController,
         PatientAuthController $authController,
         PatientPortalController $portalController,
+        LeadsController $leadsController,
         WebhookController $webhookController
     ) {
         $this->appointmentsController = $appointmentsController;
         $this->doctorsController = $doctorsController;
         $this->authController = $authController;
         $this->portalController = $portalController;
+        $this->leadsController = $leadsController;
         $this->webhookController = $webhookController;
         
         add_action('rest_api_init', [$this, 'register_routes']);
@@ -85,6 +89,13 @@ class RestRegistrar {
         register_rest_route($namespace, '/webhook/crm', [
             'methods' => 'POST',
             'callback' => [$this->webhookController, 'handle_webhook'],
+            'permission_callback' => '__return_true'
+        ]);
+
+        // Leads API
+        register_rest_route($namespace, '/leads', [
+            'methods' => 'POST',
+            'callback' => [$this->leadsController, 'create_lead'],
             'permission_callback' => '__return_true'
         ]);
     }

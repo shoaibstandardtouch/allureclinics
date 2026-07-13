@@ -3,6 +3,16 @@
     <hr>
     
     <div style="background:#fff; padding:20px; border:1px solid #ccd0d4; box-shadow:0 1px 1px rgba(0,0,0,.04); max-width: 800px; margin-top: 20px;">
+        <h2><?php esc_html_e('Demo Mode', 'allure-clinics'); ?></h2>
+        <p><?php esc_html_e('Use these tools to populate the plugin with realistic dummy data for presentation purposes.', 'allure-clinics'); ?></p>
+        <form method="post" action="" style="margin-bottom: 20px;">
+            <?php wp_nonce_field('demo_action', 'allure_clinics_demo_nonce'); ?>
+            <input type="submit" name="load_demo_data" class="button button-primary" value="<?php esc_attr_e('Load Demo Data', 'allure-clinics'); ?>">
+            <input type="submit" name="clear_demo_data" class="button" value="<?php esc_attr_e('Clear Demo Data', 'allure-clinics'); ?>" onclick="return confirm('<?php esc_attr_e('Are you sure you want to delete all local demo data?', 'allure-clinics'); ?>');">
+        </form>
+    </div>
+
+    <div style="background:#fff; padding:20px; border:1px solid #ccd0d4; box-shadow:0 1px 1px rgba(0,0,0,.04); max-width: 800px; margin-top: 20px;">
         <h2><?php esc_html_e('Architecture Overview', 'allure-clinics'); ?></h2>
         <p><?php esc_html_e('This plugin is not a standalone CRM. It acts as a Sync/Integration layer between the WordPress booking portal and the external CRM.', 'allure-clinics'); ?></p>
         <p><strong><?php esc_html_e('Important concept:', 'allure-clinics'); ?></strong> <?php esc_html_e('The external CRM is the single source of truth. The local database tables (wp_ac_*) act purely as a fast cache for the website to read from.', 'allure-clinics'); ?></p>
@@ -34,6 +44,18 @@
                             <li><code>POST /wp-json/allure/v1/appointments</code> - Book slot (Pushes to CRM)</li>
                             <li><code>POST /wp-json/allure/v1/auth/otp/request</code> - Request OTP for Patient Login</li>
                             <li><code>POST /wp-json/allure/v1/auth/otp/verify</code> - Verify OTP & get Session Token</li>
+                            <li><code>POST /wp-json/allure/v1/leads</code> - Capture Lead (Pushes to CRM & Emails Admin)</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Frontend Shortcodes</strong></td>
+                    <td>
+                        <ul>
+                            <li><code>[allure_booking]</code> - Multi-step booking widget</li>
+                            <li><code>[allure_patient_portal]</code> - OTP login & dashboard</li>
+                            <li><code>[allure_lead_form service="Botox"]</code> - Lead capture form</li>
+                            <li><strong>Wati Click-to-Chat</strong> - Auto-injected if number is set in settings</li>
                         </ul>
                     </td>
                 </tr>

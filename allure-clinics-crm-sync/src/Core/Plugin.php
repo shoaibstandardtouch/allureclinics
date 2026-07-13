@@ -45,12 +45,15 @@ class Plugin {
         $patientSession = new \AllureClinics\Auth\PatientSession();
 
         // CRM Sync
-        $syncManager = new \AllureClinics\CRM\SyncManager();
+        $adapterFactory = new \AllureClinics\CRM\AdapterFactory();
+        $syncManager = new \AllureClinics\CRM\SyncManager($adapterFactory);
         $webhookController = new \AllureClinics\CRM\WebhookController($syncManager);
         new \AllureClinics\Cron\SyncScheduler($syncManager);
 
         // Repos & Notifications
         $appointmentRepo = new \AllureClinics\Repositories\AppointmentRepository();
+        $branchRepo = new \AllureClinics\Repositories\BranchRepository();
+        $doctorRepo = new \AllureClinics\Repositories\DoctorRepository();
         $emailNotifier = new \AllureClinics\Notifications\EmailNotifier();
 
         // REST Controllers
@@ -58,6 +61,7 @@ class Plugin {
         $doctorsController = new \AllureClinics\Rest\DoctorsController();
         $patientAuthController = new \AllureClinics\Rest\PatientAuthController($otpService, $patientSession);
         $patientPortalController = new \AllureClinics\Rest\PatientPortalController($patientSession, $syncManager);
+        $leadsController = new \AllureClinics\Rest\LeadsController($emailNotifier);
 
         // REST Registrar
         new RestRegistrar(
@@ -65,6 +69,7 @@ class Plugin {
             $doctorsController,
             $patientAuthController,
             $patientPortalController,
+            $leadsController,
             $webhookController
         );
 
@@ -73,7 +78,18 @@ class Plugin {
             $dashboard = new \AllureClinics\Admin\Dashboard();
             $settingsPage = new \AllureClinics\Admin\SettingsPage();
             $getStartedPage = new \AllureClinics\Admin\GetStartedPage();
-            new \AllureClinics\Admin\AdminMenu($dashboard, $settingsPage, $getStartedPage);
+            $leadsPage = new \AllureClinics\Admin\LeadsPage();
+            $branchesPage = new \AllureClinics\Admin\BranchesPage($branchRepo);
+            $doctorsPage = new \AllureClinics\Admin\DoctorsPage($doctorRepo, $branchRepo);
+            
+            new \AllureClinics\Admin\AdminMenu(
+                $dashboard, 
+                $settingsPage, 
+                $getStartedPage, 
+                $leadsPage,
+                $branchesPage,
+                $doctorsPage
+            );
         }
     }
 
@@ -88,10 +104,17 @@ class Plugin {
      * Register public hooks.
      */
     private function define_public_hooks() {
+        // Enqueue public scripts and styles if needed
+        add_action('wp_enqueue_scripts', [$this, 'enqueue_public_scripts']);
+        
+        // Instantiate Frontend Shortcodes & Widgets
+        new \AllureClinics\Frontend\ShortcodeBookingWidget();
+        new \AllureClinics\Frontend\ShortcodeLeadForm();
+        new \AllureClinics\Frontend\ShortcodePatientPortal();
+        new \AllureClinics\Frontend\WatiClickToChat();
+        
         // Add custom cron schedule
         add_filter( 'cron_schedules', array( $this, 'add_cron_intervals' ) );
-        
-        // We will wire up REST API and Shortcodes later.
     }
 
     /**

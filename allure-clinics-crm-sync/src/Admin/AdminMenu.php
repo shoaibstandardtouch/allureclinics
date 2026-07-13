@@ -7,11 +7,24 @@ class AdminMenu {
     private Dashboard $dashboard;
     private SettingsPage $settingsPage;
     private GetStartedPage $getStartedPage;
+    private LeadsPage $leadsPage;
+    private BranchesPage $branchesPage;
+    private DoctorsPage $doctorsPage;
 
-    public function __construct(Dashboard $dashboard, SettingsPage $settingsPage, GetStartedPage $getStartedPage) {
+    public function __construct(
+        Dashboard $dashboard, 
+        SettingsPage $settingsPage, 
+        GetStartedPage $getStartedPage, 
+        LeadsPage $leadsPage,
+        BranchesPage $branchesPage,
+        DoctorsPage $doctorsPage
+    ) {
         $this->dashboard = $dashboard;
         $this->settingsPage = $settingsPage;
         $this->getStartedPage = $getStartedPage;
+        $this->leadsPage = $leadsPage;
+        $this->branchesPage = $branchesPage;
+        $this->doctorsPage = $doctorsPage;
         
         add_action('admin_menu', [$this, 'registerMenus']);
     }
@@ -34,6 +47,33 @@ class AdminMenu {
             'manage_options',
             'allure-crm-dashboard',
             [$this->dashboard, 'render']
+        );
+
+        add_submenu_page(
+            'allure-crm-dashboard',
+            __('Branches', 'allure-clinics'),
+            __('Branches', 'allure-clinics'),
+            'manage_options',
+            'allure-crm-branches',
+            [$this->branchesPage, 'render']
+        );
+
+        add_submenu_page(
+            'allure-crm-dashboard',
+            __('Doctors', 'allure-clinics'),
+            __('Doctors', 'allure-clinics'),
+            'manage_options',
+            'allure-crm-doctors',
+            [$this->doctorsPage, 'render']
+        );
+
+        add_submenu_page(
+            'allure-crm-dashboard',
+            __('Leads', 'allure-clinics'),
+            __('Leads', 'allure-clinics'),
+            'manage_options',
+            'allure-crm-leads',
+            [$this->leadsPage, 'render']
         );
 
         add_submenu_page(

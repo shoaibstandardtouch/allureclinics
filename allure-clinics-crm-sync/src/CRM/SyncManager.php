@@ -6,23 +6,17 @@ use AllureClinics\CRM\Adapters\NullAdapter;
 
 class SyncManager {
 
-    private CrmAdapterInterface $adapter;
+    private AdapterFactory $adapterFactory;
 
-    public function __construct(?CrmAdapterInterface $adapter = null) {
-        // By default, load the adapter from settings, or fallback to NullAdapter
-        if ($adapter) {
-            $this->adapter = $adapter;
-        } else {
-            // For now, hardcode NullAdapter. In Step 5 we will load this dynamically from WP options.
-            $this->adapter = new NullAdapter();
-        }
+    public function __construct(AdapterFactory $adapterFactory) {
+        $this->adapterFactory = $adapterFactory;
     }
 
     /**
      * Get the currently active adapter.
      */
     public function getAdapter(): CrmAdapterInterface {
-        return $this->adapter;
+        return $this->adapterFactory->getActiveAdapter();
     }
 
     /**

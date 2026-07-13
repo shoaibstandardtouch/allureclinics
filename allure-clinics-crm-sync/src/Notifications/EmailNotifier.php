@@ -34,4 +34,20 @@ class EmailNotifier {
 
         return wp_mail($to, $subject, $message, $headers);
     }
+
+    /**
+     * Send new lead notification to admin.
+     */
+    public function sendAdminLeadNotification(array $leadData): bool {
+        $to = get_option('admin_email');
+        $subject = __('New Lead Captured: ', 'allure-clinics') . $leadData['service_interest'];
+        
+        ob_start();
+        include plugin_dir_path(__FILE__) . 'templates/admin-lead-notification.php';
+        $message = ob_get_clean();
+
+        $headers = array('Content-Type: text/html; charset=UTF-8');
+
+        return wp_mail($to, $subject, $message, $headers);
+    }
 }
