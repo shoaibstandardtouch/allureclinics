@@ -8,10 +8,8 @@ class AdminMenu {
     private SettingsPage $settingsPage;
     private GetStartedPage $getStartedPage;
     private LeadsPage $leadsPage;
-    private BranchesPage $branchesPage;
     private ?BranchesPage $branchesPage;
     private ?DoctorsPage $doctorsPage;
-
     public function __construct(
         Dashboard $dashboard, 
         SettingsPage $settingsPage, 
