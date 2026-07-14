@@ -39,41 +39,52 @@ class Plugin {
      * Initialize all services and dependencies.
      */
     private function init_services() {
+        $is_bookly_active = class_exists('\Bookly\Lib\Entities\Appointment');
+        
         // Auth / SMS
         $smsProvider = \AllureClinics\Auth\SmsProviderFactory::create();
         $otpService = new \AllureClinics\Auth\OtpService($smsProvider);
         $patientSession = new \AllureClinics\Auth\PatientSession();
 
-        // CRM Sync
+        // CRM Sync Core
         $adapterFactory = new \AllureClinics\CRM\AdapterFactory();
         $syncManager = new \AllureClinics\CRM\SyncManager($adapterFactory);
         $webhookController = new \AllureClinics\CRM\WebhookController($syncManager);
-        new \AllureClinics\Cron\SyncScheduler($syncManager);
-
-        // Repos & Notifications
-        $appointmentRepo = new \AllureClinics\Repositories\AppointmentRepository();
-        $branchRepo = new \AllureClinics\Repositories\BranchRepository();
-        $doctorRepo = new \AllureClinics\Repositories\DoctorRepository();
+        
+        // General Services
         $emailNotifier = new \AllureClinics\Notifications\EmailNotifier();
-
-        // REST Controllers
-        $appointmentsController = new \AllureClinics\Rest\AppointmentsController($appointmentRepo, $syncManager, $emailNotifier);
-        $doctorsController = new \AllureClinics\Rest\DoctorsController();
-        $patientAuthController = new \AllureClinics\Rest\PatientAuthController($otpService, $patientSession);
-        $patientPortalController = new \AllureClinics\Rest\PatientPortalController($patientSession, $syncManager);
         $leadsController = new \AllureClinics\Rest\LeadsController($emailNotifier);
-        $webhookController = new \AllureClinics\CRM\WebhookController($syncManager);
-        $branchesController = new \AllureClinics\Rest\BranchesController($branchRepo);
+        
+        // Bookly Integrations
+        if ($is_bookly_active) {
+            new \AllureClinics\Bookly\BooklySyncScheduler($syncManager);
+            new \AllureClinics\Bookly\BooklyReminderScheduler($smsProvider);
+            $patientPortalController = new \AllureClinics\Rest\PatientPortalController($patientSession, $syncManager);
+            $patientAuthController = new \AllureClinics\Rest\PatientAuthController($otpService, $patientSession);
 
-        $restRegistrar = new \AllureClinics\Core\RestRegistrar(
-            $appointmentsController,
-            $doctorsController,
-            $patientAuthController,
-            $patientPortalController,
-            $leadsController,
-            $webhookController,
-            $branchesController
-        );
+            $restRegistrar = new \AllureClinics\Core\RestRegistrar(
+                null, // Deprecated: appointments
+                null, // Deprecated: doctors
+                $patientAuthController,
+                $patientPortalController,
+                $leadsController,
+                $webhookController,
+                null // Deprecated: branches
+            );
+        } else {
+            // Bookly missing notice
+            add_action('admin_notices', function() {
+                echo '<div class="notice notice-error is-dismissible"><p><strong>Allure CRM:</strong> Bookly (base + Pro) not detected — Bookly sync features are disabled until it is active.</p></div>';
+            });
+            
+            // Register what we can
+            $restRegistrar = new \AllureClinics\Core\RestRegistrar(
+                null, null, null, null,
+                $leadsController,
+                $webhookController,
+                null
+            );
+        }
 
         // Admin
         if (is_admin()) {
@@ -81,16 +92,15 @@ class Plugin {
             $settingsPage = new \AllureClinics\Admin\SettingsPage();
             $getStartedPage = new \AllureClinics\Admin\GetStartedPage();
             $leadsPage = new \AllureClinics\Admin\LeadsPage();
-            $branchesPage = new \AllureClinics\Admin\BranchesPage($branchRepo);
-            $doctorsPage = new \AllureClinics\Admin\DoctorsPage($doctorRepo, $branchRepo);
             
+            // Note: BranchesPage and DoctorsPage are deprecated and removed from menu
             new \AllureClinics\Admin\AdminMenu(
                 $dashboard, 
                 $settingsPage, 
                 $getStartedPage, 
                 $leadsPage,
-                $branchesPage,
-                $doctorsPage
+                null, // Deprecated
+                null  // Deprecated
             );
         }
     }
@@ -107,10 +117,11 @@ class Plugin {
      */
     private function define_public_hooks() {
         // Instantiate Frontend Shortcodes & Widgets
-        new \AllureClinics\Frontend\ShortcodeBookingWidget();
         new \AllureClinics\Frontend\ShortcodeLeadForm();
         new \AllureClinics\Frontend\ShortcodePatientPortal();
         new \AllureClinics\Frontend\WatiClickToChat();
+        
+        // Deprecated: new \AllureClinics\Frontend\ShortcodeBookingWidget();
         
         // Add custom cron schedule
         add_filter( 'cron_schedules', array( $this, 'add_cron_intervals' ) );

@@ -40,10 +40,30 @@ class PatientPortalController {
             return new WP_REST_Response(['error' => 'Unauthorized'], 401);
         }
 
-        global $wpdb;
-        $patient = $wpdb->get_row($wpdb->prepare("SELECT id, mobile_number, name, email, dob FROM {$wpdb->prefix}ac_patients WHERE id = %d", $patient_id), ARRAY_A);
+        if (!class_exists('\Bookly\Lib\Entities\Customer')) {
+            return new WP_REST_Response(['error' => 'Bookly not active'], 503);
+        }
 
-        return new WP_REST_Response($patient, 200);
+        $customer = \Bookly\Lib\Entities\Customer::find($patient_id);
+        
+        if (!$customer) {
+            return new WP_REST_Response(['error' => 'Patient not found'], 404);
+        }
+
+        $info_fields = [];
+        if ($customer->getInfoFields()) {
+            $info_fields = json_decode($customer->getInfoFields(), true);
+        }
+
+        $profile = [
+            'id' => $customer->getId(),
+            'name' => $customer->getFullName(),
+            'email' => $customer->getEmail(),
+            'mobile_number' => $customer->getPhone(),
+            'extra_info' => $info_fields
+        ];
+
+        return new WP_REST_Response($profile, 200);
     }
 
     /**
@@ -56,19 +76,42 @@ class PatientPortalController {
             return new WP_REST_Response(['error' => 'Unauthorized'], 401);
         }
 
-        global $wpdb;
-        $appointments = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT a.*, s.date, s.start_time, d.name as doctor_name, b.name as branch_name 
-                 FROM {$wpdb->prefix}ac_appointments a
-                 JOIN {$wpdb->prefix}ac_doctor_slots s ON a.slot_id = s.id
-                 JOIN {$wpdb->prefix}ac_doctors d ON a.doctor_id = d.id
-                 JOIN {$wpdb->prefix}ac_branches b ON a.branch_id = b.id
-                 WHERE a.patient_id = %d ORDER BY s.date DESC",
-                $patient_id
-            ),
-            ARRAY_A
-        );
+        if (!class_exists('\Bookly\Lib\Entities\CustomerAppointment')) {
+            return new WP_REST_Response(['error' => 'Bookly not active'], 503);
+        }
+
+        $records = \Bookly\Lib\Entities\CustomerAppointment::query('ca')
+            ->select('
+                ca.id,
+                ca.status,
+                a.start_date,
+                a.end_date,
+                st.full_name AS doctor_name,
+                s.title AS service_name,
+                l.name AS branch_name
+            ')
+            ->leftJoin('Appointment', 'a', 'a.id = ca.appointment_id')
+            ->leftJoin('Staff', 'st', 'st.id = a.staff_id')
+            ->leftJoin('Service', 's', 's.id = a.service_id')
+            ->leftJoin('\BooklyLocations\Lib\Entities\Location', 'l', 'l.id = a.location_id')
+            ->where('ca.customer_id', $patient_id)
+            ->sortBy('a.start_date')
+            ->order('DESC')
+            ->fetchArray();
+
+        $appointments = [];
+        foreach ($records as $record) {
+            $appointments[] = [
+                'id' => $record['id'],
+                'status' => $record['status'],
+                'date' => date('Y-m-d', strtotime($record['start_date'])),
+                'start_time' => date('H:i', strtotime($record['start_date'])),
+                'end_time' => date('H:i', strtotime($record['end_date'])),
+                'doctor_name' => $record['doctor_name'],
+                'service_name' => $record['service_name'],
+                'branch_name' => $record['branch_name']
+            ];
+        }
 
         return new WP_REST_Response($appointments, 200);
     }

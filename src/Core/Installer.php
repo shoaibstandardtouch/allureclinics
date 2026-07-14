@@ -150,6 +150,15 @@ class Installer {
             PRIMARY KEY  (id),
             KEY entity_type (entity_type)
         ) $charset_collate;
+        CREATE TABLE {$wpdb->prefix}ac_reminder_log (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            appointment_id bigint(20) unsigned NOT NULL,
+            reminder_type varchar(50) NOT NULL,
+            sent_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY appointment_id (appointment_id),
+            UNIQUE KEY appt_reminder (appointment_id, reminder_type)
+        ) $charset_collate;
         ";
 
         dbDelta( $sql );

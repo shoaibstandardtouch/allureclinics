@@ -90,27 +90,19 @@ class OtpService {
             ['id' => $request['id']]
         );
 
-        // Find or create patient
-        $patient = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}ac_patients WHERE mobile_number = %s", $mobileNumber), ARRAY_A);
+        // Find or create patient in Bookly
+        $patient = clone \Bookly\Lib\Entities\Customer::query()
+            ->where('phone', $mobileNumber)
+            ->fetchRow();
 
         if (!$patient) {
-            $wpdb->insert(
-                $wpdb->prefix . 'ac_patients',
-                array(
-                    'mobile_number' => $mobileNumber,
-                    'otp_verified_at' => current_time('mysql'),
-                    'sync_status' => 'pending_push',
-                    'created_at' => current_time('mysql')
-                )
-            );
-            $patient_id = $wpdb->insert_id;
+            $customer = new \Bookly\Lib\Entities\Customer();
+            $customer->setPhone($mobileNumber);
+            $customer->setFullName('New Patient'); // Default, they can update it
+            $customer->save();
+            $patient_id = $customer->getId();
         } else {
             $patient_id = $patient['id'];
-            $wpdb->update(
-                $wpdb->prefix . 'ac_patients',
-                ['otp_verified_at' => current_time('mysql')],
-                ['id' => $patient_id]
-            );
         }
 
         return ['status' => 'success', 'patient_id' => $patient_id];

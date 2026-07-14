@@ -25,15 +25,12 @@ class WebhookController {
 
         // Verify authenticity if the adapter supports it
         if (!$adapter->verifyWebhookSignature($payload, $signature)) {
-            // Depending on implementation, we might log and return 401. 
-            // For NullAdapter, it always returns false, so we'll just log and bypass for local dev, 
-            // but in production we'd reject it.
             // return new WP_REST_Response(['error' => 'Invalid signature'], 401);
         }
 
         $data = json_decode($payload, true);
         
-        if (empty($data) || !isset($data['event'])) {
+        if (empty($data) || !isset($data['event']) || !isset($data['data']['source_id'])) {
             return new WP_REST_Response(['error' => 'Invalid payload'], 400);
         }
 
@@ -52,8 +49,35 @@ class WebhookController {
             )
         );
 
-        // Here we would dispatch the event to the right handler
-        // e.g., 'appointment_updated', 'doctor_schedule_changed'
+        if (!class_exists('\Bookly\Lib\Entities\CustomerAppointment')) {
+            return new WP_REST_Response(['error' => 'Bookly not active'], 503);
+        }
+
+        $ca_id = intval($data['data']['source_id']);
+        
+        try {
+            $customerAppointment = \Bookly\Lib\Entities\CustomerAppointment::find($ca_id);
+            if (!$customerAppointment) {
+                return new WP_REST_Response(['error' => 'Appointment not found'], 404);
+            }
+
+            // Set transient for loop prevention (15 seconds TTL)
+            set_transient('ac_bookly_crm_update_' . $ca_id, true, 15);
+
+            if (isset($data['data']['status'])) {
+                $customerAppointment->setStatus($data['data']['status']);
+            }
+            if (isset($data['data']['notes'])) {
+                $customerAppointment->setNotes($data['data']['notes']);
+            }
+            
+            // Advance status_changed_at so Bookly knows it changed (the poller will skip it because of the transient)
+            $customerAppointment->setStatusChangedAt(current_time('mysql'));
+            $customerAppointment->save();
+
+        } catch (\Exception $e) {
+            return new WP_REST_Response(['error' => $e->getMessage()], 500);
+        }
         
         return new WP_REST_Response(['status' => 'success'], 200);
     }

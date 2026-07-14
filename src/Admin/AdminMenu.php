@@ -9,15 +9,16 @@ class AdminMenu {
     private GetStartedPage $getStartedPage;
     private LeadsPage $leadsPage;
     private BranchesPage $branchesPage;
-    private DoctorsPage $doctorsPage;
+    private ?BranchesPage $branchesPage;
+    private ?DoctorsPage $doctorsPage;
 
     public function __construct(
         Dashboard $dashboard, 
         SettingsPage $settingsPage, 
         GetStartedPage $getStartedPage, 
         LeadsPage $leadsPage,
-        BranchesPage $branchesPage,
-        DoctorsPage $doctorsPage
+        ?BranchesPage $branchesPage = null,
+        ?DoctorsPage $doctorsPage = null
     ) {
         $this->dashboard = $dashboard;
         $this->settingsPage = $settingsPage;
@@ -49,23 +50,27 @@ class AdminMenu {
             [$this->dashboard, 'render']
         );
 
-        add_submenu_page(
-            'allure-crm-dashboard',
-            __('Branches', 'allure-clinics'),
-            __('Branches', 'allure-clinics'),
-            'manage_options',
-            'allure-crm-branches',
-            [$this->branchesPage, 'render']
-        );
+        if ($this->branchesPage) {
+            add_submenu_page(
+                'allure-crm-dashboard',
+                __('Branches', 'allure-clinics'),
+                __('Branches', 'allure-clinics'),
+                'manage_options',
+                'allure-crm-branches',
+                [$this->branchesPage, 'render']
+            );
+        }
 
-        add_submenu_page(
-            'allure-crm-dashboard',
-            __('Doctors', 'allure-clinics'),
-            __('Doctors', 'allure-clinics'),
-            'manage_options',
-            'allure-crm-doctors',
-            [$this->doctorsPage, 'render']
-        );
+        if ($this->doctorsPage) {
+            add_submenu_page(
+                'allure-crm-dashboard',
+                __('Doctors', 'allure-clinics'),
+                __('Doctors', 'allure-clinics'),
+                'manage_options',
+                'allure-crm-doctors',
+                [$this->doctorsPage, 'render']
+            );
+        }
 
         add_submenu_page(
             'allure-crm-dashboard',

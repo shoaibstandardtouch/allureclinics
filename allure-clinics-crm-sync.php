@@ -85,4 +85,4 @@ function run_allure_clinics_crm_sync() {
     }
 }
 
-run_allure_clinics_crm_sync();
+add_action( 'plugins_loaded', 'run_allure_clinics_crm_sync' );
