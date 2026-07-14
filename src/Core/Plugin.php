@@ -61,16 +61,18 @@ class Plugin {
         $doctorsController = new \AllureClinics\Rest\DoctorsController();
         $patientAuthController = new \AllureClinics\Rest\PatientAuthController($otpService, $patientSession);
         $patientPortalController = new \AllureClinics\Rest\PatientPortalController($patientSession, $syncManager);
-        $leadsController = new \AllureClinics\Rest\LeadsController($emailNotifier);
+        $leadsController = new \AllureClinics\Rest\LeadsController(new \AllureClinics\Repositories\LeadRepository());
+        $webhookController = new \AllureClinics\CRM\WebhookController($syncManager);
+        $branchesController = new \AllureClinics\Rest\BranchesController($branchRepo);
 
-        // REST Registrar
-        new RestRegistrar(
+        $restRegistrar = new \AllureClinics\Core\RestRegistrar(
             $appointmentsController,
             $doctorsController,
             $patientAuthController,
             $patientPortalController,
             $leadsController,
-            $webhookController
+            $webhookController,
+            $branchesController
         );
 
         // Admin

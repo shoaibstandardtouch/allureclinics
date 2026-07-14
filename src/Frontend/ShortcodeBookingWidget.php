@@ -187,26 +187,19 @@ class ShortcodeBookingWidget {
                 });
             });
 
-            // 1. Fetch Doctors & Branches
-            fetch('/wp-json/allure/v1/doctors')
-            .then(res => res.json())
-            .then(data => {
-                state.doctors = data;
+            // 1. Fetch Branches & Doctors
+            Promise.all([
+                fetch('/wp-json/allure/v1/branches').then(res => res.json()),
+                fetch('/wp-json/allure/v1/doctors').then(res => res.json())
+            ]).then(([branches, doctors]) => {
+                state.doctors = doctors;
                 
-                // Extract unique branches
-                const branches = new Map();
-                data.forEach(d => {
-                    if (!branches.has(d.branch_id)) {
-                        branches.set(d.branch_id, d.branch_name);
-                    }
+                dom.branchSelect.innerHTML = '<option value=""><?php esc_html_e('All Branches', 'allure-clinics'); ?></option>';
+                branches.forEach(branch => {
+                    dom.branchSelect.innerHTML += `<option value="${branch.id}">${branch.name}</option>`;
                 });
 
-                dom.branchSelect.innerHTML = '<option value="">All Branches</option>';
-                branches.forEach((name, id) => {
-                    dom.branchSelect.innerHTML += `<option value="${id}">${name}</option>`;
-                });
-
-                renderDoctors(data);
+                renderDoctors(doctors);
             });
 
             dom.branchSelect.addEventListener('change', (e) => {

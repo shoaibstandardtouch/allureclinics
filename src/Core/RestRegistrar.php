@@ -8,6 +8,7 @@ use AllureClinics\Rest\PatientAuthController;
 use AllureClinics\Rest\PatientPortalController;
 use AllureClinics\Rest\LeadsController;
 use AllureClinics\CRM\WebhookController;
+use AllureClinics\Rest\BranchesController;
 
 class RestRegistrar {
 
@@ -17,6 +18,7 @@ class RestRegistrar {
     private PatientPortalController $portalController;
     private LeadsController $leadsController;
     private WebhookController $webhookController;
+    private BranchesController $branchesController;
 
     public function __construct(
         AppointmentsController $appointmentsController,
@@ -24,7 +26,8 @@ class RestRegistrar {
         PatientAuthController $authController,
         PatientPortalController $portalController,
         LeadsController $leadsController,
-        WebhookController $webhookController
+        WebhookController $webhookController,
+        BranchesController $branchesController
     ) {
         $this->appointmentsController = $appointmentsController;
         $this->doctorsController = $doctorsController;
@@ -32,12 +35,20 @@ class RestRegistrar {
         $this->portalController = $portalController;
         $this->leadsController = $leadsController;
         $this->webhookController = $webhookController;
+        $this->branchesController = $branchesController;
         
         add_action('rest_api_init', [$this, 'register_routes']);
     }
 
     public function register_routes() {
         $namespace = 'allure/v1';
+
+        // Branches (Public)
+        register_rest_route($namespace, '/branches', [
+            'methods' => 'GET',
+            'callback' => [$this->branchesController, 'get_branches'],
+            'permission_callback' => '__return_true'
+        ]);
 
         // Doctors & Slots (Public)
         register_rest_route($namespace, '/doctors', [
