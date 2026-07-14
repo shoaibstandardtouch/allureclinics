@@ -189,8 +189,8 @@ class ShortcodeBookingWidget {
 
             // 1. Fetch Branches & Doctors
             Promise.all([
-                fetch('/wp-json/allure/v1/branches').then(res => res.json()),
-                fetch('/wp-json/allure/v1/doctors').then(res => res.json())
+                fetch('<?php echo esc_url(rest_url('allure/v1/branches')); ?>').then(res => res.json()),
+                fetch('<?php echo esc_url(rest_url('allure/v1/doctors')); ?>').then(res => res.json())
             ]).then(([branches, doctors]) => {
                 state.doctors = doctors;
                 
@@ -249,7 +249,7 @@ class ShortcodeBookingWidget {
 
                 dom.slotList.innerHTML = '<?php esc_html_e('Loading slots...', 'allure-clinics'); ?>';
 
-                fetch(`/wp-json/allure/v1/doctors/${state.selectedDoctor.id}/schedule?date=${date}`)
+                fetch(`<?php echo esc_url(rest_url('allure/v1/doctors/')); ?>${state.selectedDoctor.id}/schedule?date=${date}`)
                 .then(res => res.json())
                 .then(data => {
                     dom.slotList.innerHTML = '';
@@ -302,7 +302,7 @@ class ShortcodeBookingWidget {
                 btn.disabled = true;
                 btn.innerText = '...';
 
-                fetch('/wp-json/allure/v1/auth/otp/request', {
+                fetch('<?php echo esc_url(rest_url('allure/v1/auth/otp/request')); ?>', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ mobile: mobile })
@@ -340,7 +340,7 @@ class ShortcodeBookingWidget {
 
                         if (!otp) throw new Error('<?php esc_html_e('Please enter OTP.', 'allure-clinics'); ?>');
 
-                        const verifyRes = await fetch('/wp-json/allure/v1/auth/otp/verify', {
+                        const verifyRes = await fetch('<?php echo esc_url(rest_url('allure/v1/auth/otp/verify')); ?>', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ mobile, otp, name, email })
@@ -354,7 +354,7 @@ class ShortcodeBookingWidget {
                     }
 
                     // Book Slot
-                    const bookRes = await fetch('/wp-json/allure/v1/appointments', {
+                    const bookRes = await fetch('<?php echo esc_url(rest_url('allure/v1/appointments')); ?>', {
                         method: 'POST',
                         headers: { 
                             'Content-Type': 'application/json',

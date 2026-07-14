@@ -116,7 +116,7 @@ class ShortcodePatientPortal {
                 dom.dashboard.style.display = 'block';
 
                 // Fetch Profile
-                fetch('/wp-json/allure/v1/patient/profile', {
+                fetch('<?php echo esc_url(rest_url('allure/v1/patient/profile')); ?>', {
                     headers: { 'Authorization': 'Bearer ' + sessionToken }
                 })
                 .then(res => res.json())
@@ -128,7 +128,7 @@ class ShortcodePatientPortal {
                 });
 
                 // Fetch Appointments
-                fetch('/wp-json/allure/v1/patient/appointments', {
+                fetch('<?php echo esc_url(rest_url('allure/v1/patient/appointments')); ?>', {
                     headers: { 'Authorization': 'Bearer ' + sessionToken }
                 })
                 .then(res => res.json())
@@ -189,7 +189,7 @@ class ShortcodePatientPortal {
                 dom.btnRequest.disabled = true;
                 dom.btnRequest.innerText = '...';
 
-                fetch('/wp-json/allure/v1/auth/otp/request', {
+                fetch('<?php echo esc_url(rest_url('allure/v1/auth/otp/request')); ?>', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ mobile: currentMobile })
@@ -218,7 +218,7 @@ class ShortcodePatientPortal {
                 dom.btnVerify.disabled = true;
                 dom.btnVerify.innerText = '...';
 
-                fetch('/wp-json/allure/v1/auth/otp/verify', {
+                fetch('<?php echo esc_url(rest_url('allure/v1/auth/otp/verify')); ?>', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ mobile: currentMobile, otp: otp })

@@ -92,7 +92,7 @@ class ShortcodeLeadForm {
                     message: document.getElementById('ac_lead_message').value
                 };
 
-                fetch('/wp-json/allure/v1/leads', {
+                fetch('<?php echo esc_url(rest_url('allure/v1/leads')); ?>', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)

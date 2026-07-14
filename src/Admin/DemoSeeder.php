@@ -13,7 +13,6 @@ class DemoSeeder {
                 'name' => 'Allure Clinics — North Branch',
                 'name_ar' => 'عيادات ألور — فرع الشمال',
                 'address' => 'Al Malqa District, Riyadh 13521',
-                'address_ar' => 'حي الملقا، الرياض 13521',
                 'phone' => '+966500000001',
                 'crm_id' => null,
                 'sync_status' => 'synced',
@@ -24,7 +23,6 @@ class DemoSeeder {
                 'name' => 'Allure Clinics — Olaya Branch',
                 'name_ar' => 'عيادات ألور — فرع العليا',
                 'address' => 'Olaya Street, Riyadh 12211',
-                'address_ar' => 'شارع العليا، الرياض 12211',
                 'phone' => '+966500000002',
                 'crm_id' => null,
                 'sync_status' => 'synced',
@@ -50,7 +48,6 @@ class DemoSeeder {
                 'bio_ar' => 'د. ليان هي طبيبة تجميل رائدة متخصصة في تجديد شباب الوجه بدون جراحة. تتمتع بخبرة تزيد عن 8 سنوات، وتشتهر بنتائجها الطبيعية في حقن البوتوكس والفيلر.',
                 'years_experience' => 8,
                 'qualifications' => wp_json_encode(['MD, King Saud University', 'Board Certified in Aesthetic Medicine']),
-                'photo_url' => 'https://via.placeholder.com/300x300.png?text=Dr.+Layan',
                 'crm_id' => null,
                 'sync_status' => 'synced',
                 'created_at' => current_time('mysql'),
@@ -65,7 +62,6 @@ class DemoSeeder {
                 'bio_ar' => 'يقدم د. عمر خبرة لا مثيل لها في علاجات الليزر المتقدمة وشد الجلد بالترددات الراديوية. يركز على خطط العلاج المصممة خصيصًا للتصبغات وترهل الجلد.',
                 'years_experience' => 12,
                 'qualifications' => wp_json_encode(['Fellowship in Dermatologic Laser Surgery']),
-                'photo_url' => 'https://via.placeholder.com/300x300.png?text=Dr.+Omar',
                 'crm_id' => null,
                 'sync_status' => 'synced',
                 'created_at' => current_time('mysql'),
@@ -80,7 +76,6 @@ class DemoSeeder {
                 'bio_ar' => 'طبيبة أمراض جلدية مدربة دوليًا، تتفوق د. سارة في أنظمة العناية بالبشرة المخصصة وعلاجات الوجه الطبية، مما يساعد المرضى على تحقيق بشرة متألقة وخالية من العيوب.',
                 'years_experience' => 6,
                 'qualifications' => wp_json_encode(['MSc Dermatology, UK']),
-                'photo_url' => 'https://via.placeholder.com/300x300.png?text=Dr.+Sarah',
                 'crm_id' => null,
                 'sync_status' => 'synced',
                 'created_at' => current_time('mysql'),
@@ -95,7 +90,6 @@ class DemoSeeder {
                 'bio_ar' => 'يحظى د. فهد باحترام كبير لدقته المتناهية في زراعة الشعر بتقنية الاقتطاف واستراتيجيات تقليل الشعر الدائمة.',
                 'years_experience' => 15,
                 'qualifications' => wp_json_encode(['ABHRS Diplomat', 'MD, King Abdulaziz University']),
-                'photo_url' => 'https://via.placeholder.com/300x300.png?text=Dr.+Fahad',
                 'crm_id' => null,
                 'sync_status' => 'synced',
                 'created_at' => current_time('mysql'),
@@ -110,7 +104,6 @@ class DemoSeeder {
                 'bio_ar' => 'تعرف د. مايا بلمستها اللطيفة ونظرتها الفنية، حيث تجمع بين الحقن وتقنيات الشد غير الجراحية لتقديم تحسينات مذهلة ومتوازنة.',
                 'years_experience' => 9,
                 'qualifications' => wp_json_encode(['American Board of Anti-Aging & Regenerative Medicine']),
-                'photo_url' => 'https://via.placeholder.com/300x300.png?text=Dr.+Maya',
                 'crm_id' => null,
                 'sync_status' => 'synced',
                 'created_at' => current_time('mysql'),
@@ -142,7 +135,10 @@ class DemoSeeder {
             // Saturday 10:00 AM–10:30 PM (22:30), Other days 10:00 AM–10:00 PM (22:00)
             $end_hour = ($day_of_week === 6) ? 22.5 : 22.0;
 
-            foreach ($doctor_ids as $doctor_id) {
+            foreach ($doctors as $i => $doctor_data) {
+                $doctor_id = $doctor_ids[$i];
+                $branch_id = $doctor_data['branch_id'];
+
                 for ($hour = 10; $hour < $end_hour; $hour += 0.5) {
                     $h = floor($hour);
                     $m = ($hour - $h) * 60;
@@ -150,10 +146,11 @@ class DemoSeeder {
 
                     $slots[] = [
                         'doctor_id' => $doctor_id,
+                        'branch_id' => $branch_id,
                         'date' => $date->format('Y-m-d'),
                         'start_time' => $time_string,
                         'end_time' => date('H:i:00', strtotime("+30 minutes", strtotime($date->format('Y-m-d') . ' ' . $time_string))),
-                        'is_available' => 1,
+                        'status' => 'available',
                         'crm_id' => null,
                         'sync_status' => 'synced',
                         'created_at' => current_time('mysql'),
@@ -166,12 +163,12 @@ class DemoSeeder {
         // Batch insert slots (chunk to avoid huge query)
         $chunks = array_chunk($slots, 100);
         foreach ($chunks as $chunk) {
-            $query = "INSERT INTO {$wpdb->prefix}ac_doctor_slots (doctor_id, date, start_time, end_time, is_available, crm_id, sync_status, created_at, updated_at) VALUES ";
+            $query = "INSERT INTO {$wpdb->prefix}ac_doctor_slots (doctor_id, branch_id, date, start_time, end_time, status, crm_id, sync_status, created_at, updated_at) VALUES ";
             $values = [];
             foreach ($chunk as $s) {
                 $values[] = $wpdb->prepare(
-                    "(%d, %s, %s, %s, %d, NULL, %s, %s, %s)",
-                    $s['doctor_id'], $s['date'], $s['start_time'], $s['end_time'], $s['is_available'], $s['sync_status'], $s['created_at'], $s['updated_at']
+                    "(%d, %d, %s, %s, %s, %s, NULL, %s, %s, %s)",
+                    $s['doctor_id'], $s['branch_id'], $s['date'], $s['start_time'], $s['end_time'], $s['status'], $s['sync_status'], $s['created_at'], $s['updated_at']
                 );
             }
             $query .= implode(', ', $values);
