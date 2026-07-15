@@ -20,6 +20,31 @@ class GetStartedPage {
             }
         }
 
+        // Calculate checklist statuses
+        $bookly_core_active = class_exists('\Bookly\Lib\Plugin');
+        $bookly_pro_active = class_exists('\BooklyPro\Lib\Plugin');
+        $locations_active = class_exists('\BooklyLocations\Lib\Plugin');
+        $waiting_list_active = class_exists('\BooklyWaitingList\Lib\Plugin');
+        $custom_fields_active = class_exists('\BooklyCustomFields\Lib\Plugin');
+        $customer_info_active = class_exists('\BooklyCustomerInformation\Lib\Plugin');
+        $custom_statuses_active = class_exists('\BooklyCustomStatuses\Lib\Plugin');
+        
+        $addons_active = $locations_active && $waiting_list_active && $custom_fields_active && $customer_info_active && $custom_statuses_active;
+
+        $staff_count = class_exists('\Bookly\Lib\Entities\Staff') ? \Bookly\Lib\Entities\Staff::query()->count() : 0;
+        $location_count = class_exists('\BooklyLocations\Lib\Entities\Location') ? \BooklyLocations\Lib\Entities\Location::query()->count() : 0;
+        
+        $has_staff_and_location = ($staff_count > 0 && $location_count > 0);
+
+        $taqnyat_bearer = get_option('allure_clinics_taqnyat_bearer');
+        $taqnyat_sender = get_option('allure_clinics_taqnyat_sender');
+        $has_sms_creds = (!empty($taqnyat_bearer) && !empty($taqnyat_sender));
+
+        $book_page = get_page_by_path('book-appointment');
+        $portal_page = get_page_by_path('patient-portal');
+        $contact_page = get_page_by_path('contact-us');
+        $has_demo_pages = ($book_page && $portal_page && $contact_page);
+
         include plugin_dir_path(__FILE__) . 'views/get-started.php';
     }
 
@@ -28,7 +53,7 @@ class GetStartedPage {
             [
                 'post_title'   => 'Book Appointment',
                 'post_name'    => 'book-appointment',
-                'post_content' => '<!-- wp:shortcode -->[allure_booking]<!-- /wp:shortcode -->',
+                'post_content' => '<!-- wp:shortcode -->[bookly-form]<!-- /wp:shortcode -->',
                 'post_status'  => 'publish',
                 'post_type'    => 'page',
             ],
@@ -52,6 +77,12 @@ class GetStartedPage {
             $existing = get_page_by_path($page['post_name']);
             if (!$existing) {
                 wp_insert_post($page);
+            } else {
+                // Repair path: if the Book Appointment page exists but has the old shortcode, update it.
+                if ($page['post_name'] === 'book-appointment' && strpos($existing->post_content, '[allure_booking]') !== false) {
+                    $existing->post_content = str_replace('[allure_booking]', '[bookly-form]', $existing->post_content);
+                    wp_update_post($existing);
+                }
             }
         }
     }

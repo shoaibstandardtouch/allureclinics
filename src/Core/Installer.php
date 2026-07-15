@@ -122,6 +122,7 @@ class Installer {
             campaign_source varchar(255) DEFAULT NULL,
             message text DEFAULT NULL,
             status varchar(50) DEFAULT 'new',
+            is_demo tinyint(1) DEFAULT 0,
             created_at datetime DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY  (id)
         ) $charset_collate;

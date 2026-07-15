@@ -14,7 +14,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 // Define plugin constants
-define( 'ALLURE_CLINICS_VERSION', '1.0.0' );
+define( 'ALLURE_CLINICS_VERSION', '1.0.1' );
 define( 'ALLURE_CLINICS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ALLURE_CLINICS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
