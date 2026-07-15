@@ -140,7 +140,7 @@ class DemoSeeder {
         if (class_exists('\BooklyLocations\Lib\Entities\Location')) {
             $locationNames = ['Allure Clinics — North Branch', 'Allure Clinics — Olaya Branch'];
             foreach ($locationNames as $name) {
-                $locations = clone \BooklyLocations\Lib\Entities\Location::query()->where('name', $name)->find();
+                $locations = \BooklyLocations\Lib\Entities\Location::query()->where('name', $name)->find();
                 foreach ($locations as $loc) {
                     $loc->delete();
                 }
@@ -151,7 +151,7 @@ class DemoSeeder {
         if (class_exists('\Bookly\Lib\Entities\Staff')) {
             $staffEmails = ['layan@example.com', 'omar@example.com', 'sarah@example.com', 'fahad@example.com', 'maya@example.com'];
             foreach ($staffEmails as $email) {
-                $staffList = clone \Bookly\Lib\Entities\Staff::query()->where('email', $email)->find();
+                $staffList = \Bookly\Lib\Entities\Staff::query()->where('email', $email)->find();
                 foreach ($staffList as $staff) {
                     $staff->delete();
                 }
