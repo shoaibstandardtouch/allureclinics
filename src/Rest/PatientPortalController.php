@@ -115,4 +115,79 @@ class PatientPortalController {
 
         return new WP_REST_Response($appointments, 200);
     }
+
+    /**
+     * Get patient invoices
+     * GET /allure/v1/patient/invoices
+     */
+    public function get_invoices(WP_REST_Request $request): WP_REST_Response {
+        $patient_id = $this->authenticate($request);
+        if (!$patient_id) {
+            return new WP_REST_Response(['error' => 'Unauthorized'], 401);
+        }
+
+        if (!class_exists('\Bookly\Lib\Entities\Customer')) {
+            return new WP_REST_Response(['error' => 'Bookly not active'], 503);
+        }
+
+        $customer = \Bookly\Lib\Entities\Customer::find($patient_id);
+        if (!$customer) {
+            return new WP_REST_Response(['error' => 'Patient not found'], 404);
+        }
+
+        // Fetch CRM patient mapping
+        global $wpdb;
+        $crm_id = $wpdb->get_var($wpdb->prepare("SELECT crm_id FROM {$wpdb->prefix}ac_patients WHERE mobile_number = %s", $customer->getPhone()));
+
+        if (!$crm_id) {
+            // Patient not synced yet
+            return new WP_REST_Response([], 200);
+        }
+
+        $adapter = $this->syncManager->getAdapter();
+        $invoices = $adapter->getPatientInvoices($crm_id);
+
+        return new WP_REST_Response($invoices, 200);
+    }
+
+    /**
+     * Get patient medical history
+     * GET /allure/v1/patient/medical-history
+     */
+    public function get_medical_history(WP_REST_Request $request): WP_REST_Response {
+        $patient_id = $this->authenticate($request);
+        if (!$patient_id) {
+            return new WP_REST_Response(['error' => 'Unauthorized'], 401);
+        }
+
+        if (!class_exists('\Bookly\Lib\Entities\Customer')) {
+            return new WP_REST_Response(['error' => 'Bookly not active'], 503);
+        }
+
+        $customer = \Bookly\Lib\Entities\Customer::find($patient_id);
+        if (!$customer) {
+            return new WP_REST_Response(['error' => 'Patient not found'], 404);
+        }
+
+        // Fetch CRM patient mapping
+        global $wpdb;
+        $crm_id = $wpdb->get_var($wpdb->prepare("SELECT crm_id FROM {$wpdb->prefix}ac_patients WHERE mobile_number = %s", $customer->getPhone()));
+
+        if (!$crm_id) {
+            // Patient not synced yet
+            return new WP_REST_Response([
+                'consultations' => [],
+                'treatments' => [],
+                'visits' => [],
+                'prescriptions' => [],
+                'labs' => [],
+                'documents' => []
+            ], 200);
+        }
+
+        $adapter = $this->syncManager->getAdapter();
+        $history = $adapter->getPatientMedicalHistory($crm_id);
+
+        return new WP_REST_Response($history, 200);
+    }
 }

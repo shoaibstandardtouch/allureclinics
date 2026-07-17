@@ -56,5 +56,16 @@
             </p>
         </div>
 
+        <!-- Call Clicks -->
+        <div style="background:#fff; padding:20px; border:1px solid #ccd0d4; box-shadow:0 1px 1px rgba(0,0,0,.04); min-width: 200px;">
+            <h3><?php esc_html_e('Call Clicks (30 Days)', 'allure-clinics'); ?></h3>
+            <p style="font-size: 24px; font-weight: bold; margin: 0; color: #2271b1;">
+                <?php echo esc_html($total_call_clicks); ?> Total
+            </p>
+            <p style="font-size: 14px; margin-top: 5px; color: #555;">
+                Website: <?php echo esc_html($website_clicks); ?> | Landing: <?php echo esc_html($landing_clicks); ?>
+            </p>
+        </div>
+
     </div>
 </div>

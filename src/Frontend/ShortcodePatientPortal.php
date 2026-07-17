@@ -54,15 +54,42 @@ class ShortcodePatientPortal {
                     <button id="ac_portal_logout" style="padding: 10px 20px; background: #ffebee; color: #e74c3c; border: 1px solid #ffcdd2; border-radius: 8px; cursor: pointer; font-family: inherit; font-weight: 600; transition: all 0.2s;"><?php esc_html_e('Logout', 'allure-clinics'); ?></button>
                 </div>
 
-                <div style="background: #ffffff; padding: 30px; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); margin-bottom: 25px;">
-                    <h3 style="margin-top:0; color: #2c3e50; font-weight: 600; font-size: 20px; border-bottom: 2px solid #5ab0a9; padding-bottom: 10px; display: inline-block; margin-bottom: 20px;"><?php esc_html_e('Upcoming Appointments', 'allure-clinics'); ?></h3>
-                    <div id="ac_portal_upcoming"></div>
+                <!-- Tabs Navigation -->
+                <div style="display: flex; gap: 15px; margin-bottom: 25px; border-bottom: 2px solid #edf2f7; padding-bottom: 15px; overflow-x: auto;">
+                    <button class="ac-portal-tab active" data-target="tab-appointments" style="background:none; border:none; color:#5ab0a9; font-weight:600; font-size:16px; font-family:inherit; cursor:pointer; padding: 5px 10px; border-bottom: 3px solid #5ab0a9;">Appointments</button>
+                    <button class="ac-portal-tab" data-target="tab-invoices" style="background:none; border:none; color:#7f8c8d; font-weight:600; font-size:16px; font-family:inherit; cursor:pointer; padding: 5px 10px; border-bottom: 3px solid transparent;">Invoices</button>
+                    <button class="ac-portal-tab" data-target="tab-medical-history" style="background:none; border:none; color:#7f8c8d; font-weight:600; font-size:16px; font-family:inherit; cursor:pointer; padding: 5px 10px; border-bottom: 3px solid transparent;">Medical History</button>
                 </div>
 
-                <div style="background: #ffffff; padding: 30px; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.06);">
-                    <h3 style="margin-top:0; color: #2c3e50; font-weight: 600; font-size: 20px; border-bottom: 2px solid #bdc3c7; padding-bottom: 10px; display: inline-block; margin-bottom: 20px;"><?php esc_html_e('Past Appointments', 'allure-clinics'); ?></h3>
-                    <div id="ac_portal_past"></div>
+                <!-- Tab: Appointments -->
+                <div id="tab-appointments" class="ac-portal-tab-content">
+                    <div style="background: #ffffff; padding: 30px; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); margin-bottom: 25px;">
+                        <h3 style="margin-top:0; color: #2c3e50; font-weight: 600; font-size: 20px; border-bottom: 2px solid #5ab0a9; padding-bottom: 10px; display: inline-block; margin-bottom: 20px;"><?php esc_html_e('Upcoming Appointments', 'allure-clinics'); ?></h3>
+                        <div id="ac_portal_upcoming"></div>
+                    </div>
+
+                    <div style="background: #ffffff; padding: 30px; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.06);">
+                        <h3 style="margin-top:0; color: #2c3e50; font-weight: 600; font-size: 20px; border-bottom: 2px solid #bdc3c7; padding-bottom: 10px; display: inline-block; margin-bottom: 20px;"><?php esc_html_e('Past Appointments', 'allure-clinics'); ?></h3>
+                        <div id="ac_portal_past"></div>
+                    </div>
                 </div>
+
+                <!-- Tab: Invoices -->
+                <div id="tab-invoices" class="ac-portal-tab-content" style="display:none;">
+                    <div style="background: #ffffff; padding: 40px; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); text-align: center;">
+                        <div id="ac_portal_invoices_loading" style="color: #7f8c8d;"><?php esc_html_e('Loading invoices...', 'allure-clinics'); ?></div>
+                        <div id="ac_portal_invoices_content" style="display:none;"></div>
+                    </div>
+                </div>
+
+                <!-- Tab: Medical History -->
+                <div id="tab-medical-history" class="ac-portal-tab-content" style="display:none;">
+                    <div style="background: #ffffff; padding: 40px; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); text-align: center;">
+                        <div id="ac_portal_history_loading" style="color: #7f8c8d;"><?php esc_html_e('Loading medical history...', 'allure-clinics'); ?></div>
+                        <div id="ac_portal_history_content" style="display:none;"></div>
+                    </div>
+                </div>
+
             </div>
 
         </div>
@@ -106,7 +133,16 @@ class ShortcodePatientPortal {
                 past: document.getElementById('ac_portal_past'),
                 otpSentMsg: document.getElementById('ac_portal_otp_sent_msg'),
                 testBanner: document.getElementById('ac_portal_test_banner'),
-                testOtpCode: document.getElementById('ac_portal_test_otp_code')
+                testOtpCode: document.getElementById('ac_portal_test_otp_code'),
+                
+                tabs: document.querySelectorAll('.ac-portal-tab'),
+                tabContents: document.querySelectorAll('.ac-portal-tab-content'),
+                
+                invoicesLoading: document.getElementById('ac_portal_invoices_loading'),
+                invoicesContent: document.getElementById('ac_portal_invoices_content'),
+                
+                historyLoading: document.getElementById('ac_portal_history_loading'),
+                historyContent: document.getElementById('ac_portal_history_content')
             };
 
             function showMsg(text, isError) {
@@ -115,6 +151,25 @@ class ShortcodePatientPortal {
                 dom.msg.style.color = isError ? '#721c24' : '#155724';
                 dom.msg.innerText = text;
             }
+
+            // Tab Switching Logic
+            dom.tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Reset all tabs
+                    dom.tabs.forEach(t => {
+                        t.classList.remove('active');
+                        t.style.color = '#7f8c8d';
+                        t.style.borderBottomColor = 'transparent';
+                    });
+                    dom.tabContents.forEach(c => c.style.display = 'none');
+                    
+                    // Activate clicked tab
+                    this.classList.add('active');
+                    this.style.color = '#5ab0a9';
+                    this.style.borderBottomColor = '#5ab0a9';
+                    document.getElementById(this.dataset.target).style.display = 'block';
+                });
+            });
 
             function fetchDashboard() {
                 dom.login.style.display = 'none';
@@ -168,6 +223,59 @@ class ShortcodePatientPortal {
 
                     dom.upcoming.innerHTML = upcomingHtml || '<p style="color:#777;">No upcoming appointments.</p>';
                     dom.past.innerHTML = pastHtml || '<p style="color:#777;">No past appointments.</p>';
+                });
+
+                // Fetch Invoices
+                fetch('<?php echo esc_url(rest_url('allure/v1/patient/invoices')); ?>', {
+                    headers: { 'Authorization': 'Bearer ' + sessionToken }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    dom.invoicesLoading.style.display = 'none';
+                    dom.invoicesContent.style.display = 'block';
+                    
+                    if (data && data.length > 0) {
+                        // Render invoices
+                        dom.invoicesContent.innerHTML = '<p>Invoices loaded.</p>'; // Extend later
+                    } else {
+                        dom.invoicesContent.innerHTML = `
+                            <div style="padding: 20px; border: 1px dashed #ccd0d4; border-radius: 12px; background: #f8f9fa;">
+                                <p style="color: #7f8c8d; font-size: 15px; margin: 0;">Payment history will appear here once your clinic's billing system is connected.</p>
+                            </div>
+                        `;
+                    }
+                }).catch(() => {
+                    dom.invoicesLoading.style.display = 'none';
+                });
+
+                // Fetch Medical History
+                fetch('<?php echo esc_url(rest_url('allure/v1/patient/medical-history')); ?>', {
+                    headers: { 'Authorization': 'Bearer ' + sessionToken }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    dom.historyLoading.style.display = 'none';
+                    dom.historyContent.style.display = 'block';
+                    
+                    // Check if any category has data
+                    const hasData = data && (
+                        (data.consultations && data.consultations.length > 0) ||
+                        (data.treatments && data.treatments.length > 0) ||
+                        (data.prescriptions && data.prescriptions.length > 0) ||
+                        (data.labs && data.labs.length > 0)
+                    );
+
+                    if (hasData) {
+                        dom.historyContent.innerHTML = '<p>Medical history loaded.</p>'; // Extend later
+                    } else {
+                        dom.historyContent.innerHTML = `
+                            <div style="padding: 20px; border: 1px dashed #ccd0d4; border-radius: 12px; background: #f8f9fa;">
+                                <p style="color: #7f8c8d; font-size: 15px; margin: 0;">Medical records and treatment history will appear here once your clinic's EMR system is connected.</p>
+                            </div>
+                        `;
+                    }
+                }).catch(() => {
+                    dom.historyLoading.style.display = 'none';
                 });
             }
 

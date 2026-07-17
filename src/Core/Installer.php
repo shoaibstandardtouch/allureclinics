@@ -160,6 +160,15 @@ class Installer {
             KEY appointment_id (appointment_id),
             UNIQUE KEY appt_reminder (appointment_id, reminder_type)
         ) $charset_collate;
+
+        CREATE TABLE {$wpdb->prefix}ac_call_clicks (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            source varchar(100) NOT NULL DEFAULT 'website',
+            page_url text NOT NULL,
+            branch_id bigint(20) unsigned DEFAULT NULL,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id)
+        ) $charset_collate;
         ";
 
         dbDelta( $sql );

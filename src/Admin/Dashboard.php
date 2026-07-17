@@ -40,6 +40,12 @@ class Dashboard {
         $pending_sync = $wpdb->get_var("SELECT COUNT(id) FROM {$wpdb->prefix}ac_sync_log WHERE status = 'pending'");
         $failed_sync = $wpdb->get_var("SELECT COUNT(id) FROM {$wpdb->prefix}ac_sync_log WHERE status = 'failed'");
 
+        // Call Clicks
+        $thirty_days_ago = date('Y-m-d H:i:s', strtotime('-30 days'));
+        $total_call_clicks = $wpdb->get_var($wpdb->prepare("SELECT COUNT(id) FROM {$wpdb->prefix}ac_call_clicks WHERE created_at >= %s", $thirty_days_ago));
+        $website_clicks = $wpdb->get_var($wpdb->prepare("SELECT COUNT(id) FROM {$wpdb->prefix}ac_call_clicks WHERE source = 'website' AND created_at >= %s", $thirty_days_ago));
+        $landing_clicks = $wpdb->get_var($wpdb->prepare("SELECT COUNT(id) FROM {$wpdb->prefix}ac_call_clicks WHERE source = 'landing_page' AND created_at >= %s", $thirty_days_ago));
+
         include plugin_dir_path(__FILE__) . 'views/dashboard.php';
     }
 }

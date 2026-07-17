@@ -9,6 +9,7 @@ use AllureClinics\Rest\PatientPortalController;
 use AllureClinics\Rest\LeadsController;
 use AllureClinics\CRM\WebhookController;
 use AllureClinics\Rest\BranchesController;
+use AllureClinics\Rest\CallClickController;
 
 class RestRegistrar {
 
@@ -19,6 +20,7 @@ class RestRegistrar {
     private LeadsController $leadsController;
     private WebhookController $webhookController;
     private ?BranchesController $branchesController;
+    private ?CallClickController $callClickController;
 
     public function __construct(
         ?AppointmentsController $appointmentsController,
@@ -27,7 +29,8 @@ class RestRegistrar {
         ?PatientPortalController $portalController,
         LeadsController $leadsController,
         WebhookController $webhookController,
-        ?BranchesController $branchesController = null
+        ?BranchesController $branchesController = null,
+        ?CallClickController $callClickController = null
     ) {
         $this->appointmentsController = $appointmentsController;
         $this->doctorsController = $doctorsController;
@@ -36,6 +39,7 @@ class RestRegistrar {
         $this->leadsController = $leadsController;
         $this->webhookController = $webhookController;
         $this->branchesController = $branchesController;
+        $this->callClickController = $callClickController;
         
         add_action('rest_api_init', [$this, 'register_routes']);
     }
@@ -112,6 +116,18 @@ class RestRegistrar {
                 'callback' => [$this->portalController, 'get_appointments'],
                 'permission_callback' => '__return_true'
             ]);
+
+            register_rest_route($namespace, '/patient/invoices', [
+                'methods' => 'GET',
+                'callback' => [$this->portalController, 'get_invoices'],
+                'permission_callback' => '__return_true'
+            ]);
+
+            register_rest_route($namespace, '/patient/medical-history', [
+                'methods' => 'GET',
+                'callback' => [$this->portalController, 'get_medical_history'],
+                'permission_callback' => '__return_true'
+            ]);
         }
 
         // CRM Webhook
@@ -127,5 +143,14 @@ class RestRegistrar {
             'callback' => [$this->leadsController, 'create_lead'],
             'permission_callback' => '__return_true'
         ]);
+
+        // Call Click Tracking
+        if ($this->callClickController) {
+            register_rest_route($namespace, '/call-click', [
+                'methods' => 'POST',
+                'callback' => [$this->callClickController, 'log_click'],
+                'permission_callback' => '__return_true'
+            ]);
+        }
     }
 }

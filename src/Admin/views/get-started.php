@@ -126,6 +126,7 @@
             <li><strong>Add Branches:</strong> Manage in <a href="admin.php?page=bookly-locations">Bookly &rarr; Locations</a>.</li>
             <li><strong>Add Services:</strong> Manage in <a href="admin.php?page=bookly-services">Bookly &rarr; Services</a>.</li>
             <li><strong>Manage Bookings:</strong> View and manage appointments in <a href="admin.php?page=bookly-appointments">Bookly &rarr; Appointments</a> or the <a href="admin.php?page=bookly-calendar">Calendar</a>.</li>
+            <li><strong>Emergency Slots:</strong> To block out time for an emergency walk-in without deleting regular availability: Go to <strong>Bookly &rarr; Settings &rarr; Custom Statuses</strong> and create a status named "Emergency Hold" (ensure "Occupies time" / Busy is checked). Staff can then assign this status to a manual placeholder appointment in the Calendar to block public booking.</li>
             <li><strong>Waitlist:</strong> Handle waitlisted patients via Bookly's waiting list status.</li>
             <li><strong>Leads:</strong> Follow up on inquiries in <strong>Allure CRM &rarr; Leads</strong>.</li>
             <li><strong>Sync Health:</strong> Monitor CRM sync health in <strong>Allure CRM &rarr; Dashboard</strong>.</li>

@@ -57,12 +57,20 @@ interface CrmAdapterInterface {
     public function upsertPatient(array $patientData): array;
 
     /**
-     * Retrieve patient records (consultations, prescriptions, invoices).
+     * Retrieve patient invoices/payment history.
      * 
      * @param string $crmPatientId
      * @return array
      */
-    public function getPatientRecords(string $crmPatientId): array;
+    public function getPatientInvoices(string $crmPatientId): array;
+
+    /**
+     * Retrieve patient medical history (consultations, labs, prescriptions, etc.).
+     * 
+     * @param string $crmPatientId
+     * @return array
+     */
+    public function getPatientMedicalHistory(string $crmPatientId): array;
 
     /**
      * Verify incoming webhook signature from CRM.

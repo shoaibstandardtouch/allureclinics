@@ -61,6 +61,7 @@ class Plugin {
             new \AllureClinics\Bookly\BooklyReminderScheduler($smsProvider);
             $patientPortalController = new \AllureClinics\Rest\PatientPortalController($patientSession, $syncManager);
             $patientAuthController = new \AllureClinics\Rest\PatientAuthController($otpService, $patientSession);
+            $callClickController = new \AllureClinics\Rest\CallClickController();
 
             $restRegistrar = new \AllureClinics\Core\RestRegistrar(
                 null, // Deprecated: appointments
@@ -69,7 +70,8 @@ class Plugin {
                 $patientPortalController,
                 $leadsController,
                 $webhookController,
-                null // Deprecated: branches
+                null, // Deprecated: branches
+                $callClickController
             );
         } else {
             // Bookly missing notice
@@ -78,11 +80,13 @@ class Plugin {
             });
             
             // Register what we can
+            $callClickController = new \AllureClinics\Rest\CallClickController();
             $restRegistrar = new \AllureClinics\Core\RestRegistrar(
                 null, null, null, null,
                 $leadsController,
                 $webhookController,
-                null
+                null,
+                $callClickController
             );
         }
 
@@ -120,6 +124,7 @@ class Plugin {
         new \AllureClinics\Frontend\ShortcodeLeadForm();
         new \AllureClinics\Frontend\ShortcodePatientPortal();
         new \AllureClinics\Frontend\WatiClickToChat();
+        new \AllureClinics\Frontend\ClickTracker();
         
         // Deprecated: new \AllureClinics\Frontend\ShortcodeBookingWidget();
         

@@ -58,9 +58,21 @@ class NullAdapter implements CrmAdapterInterface {
         ];
     }
 
-    public function getPatientRecords(string $crmPatientId): array {
-        $this->log('getPatientRecords', ['crmPatientId' => $crmPatientId]);
+    public function getPatientInvoices(string $crmPatientId): array {
+        // Do not log PII to local sync log. Just return empty array to simulate no invoices found.
         return [];
+    }
+
+    public function getPatientMedicalHistory(string $crmPatientId): array {
+        // Do not log PII to local sync log. Return empty structured array.
+        return [
+            'consultations' => [],
+            'treatments' => [],
+            'visits' => [],
+            'prescriptions' => [],
+            'labs' => [],
+            'documents' => []
+        ];
     }
 
     public function verifyWebhookSignature(string $payload, string $signature): bool {
