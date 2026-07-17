@@ -27,6 +27,9 @@ class ShortcodePatientPortal {
                 </div>
 
                 <div id="ac-portal-step-otp" style="display:none;">
+                    <div id="ac_portal_test_banner" style="display:none; background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; font-size: 14px; border: 1px solid #ffeeba;">
+                        TEST MODE — OTP: <span id="ac_portal_test_otp_code">...</span>
+                    </div>
                     <p style="color:#27ae60; font-weight:600; font-size:14px; text-align:center; margin-bottom: 20px;" id="ac_portal_otp_sent_msg"></p>
                     <input type="text" id="ac_portal_otp" class="ac-input-premium" required style="margin-bottom: 20px; text-align:center; letter-spacing: 8px; font-size: 22px; font-weight: 600;" placeholder="123456" maxlength="6">
                     <button id="ac_portal_verify_otp" class="ac-btn-premium">
@@ -101,7 +104,9 @@ class ShortcodePatientPortal {
                 patientName: document.getElementById('ac_portal_patient_name'),
                 upcoming: document.getElementById('ac_portal_upcoming'),
                 past: document.getElementById('ac_portal_past'),
-                otpSentMsg: document.getElementById('ac_portal_otp_sent_msg')
+                otpSentMsg: document.getElementById('ac_portal_otp_sent_msg'),
+                testBanner: document.getElementById('ac_portal_test_banner'),
+                testOtpCode: document.getElementById('ac_portal_test_otp_code')
             };
 
             function showMsg(text, isError) {
@@ -176,6 +181,7 @@ class ShortcodePatientPortal {
                 dom.mobile.value = '';
                 dom.otp.value = '';
                 dom.msg.style.display = 'none';
+                dom.testBanner.style.display = 'none';
             }
 
             if (sessionToken) {
@@ -201,6 +207,24 @@ class ShortcodePatientPortal {
                         dom.stepPhone.style.display = 'none';
                         dom.stepOtp.style.display = 'block';
                         dom.otpSentMsg.innerText = res.body.message; // "OTP sent via SMS (check logs for demo)"
+                        
+                        if (res.body.test_mode) {
+                            dom.testBanner.style.display = 'block';
+                            dom.testOtpCode.innerText = 'fetching...';
+                            fetch('<?php echo esc_url(rest_url('allure/v1/admin/test-otp')); ?>?mobile=' + encodeURIComponent(currentMobile))
+                                .then(r => r.json())
+                                .then(d => {
+                                    if (d.otp) {
+                                        dom.testOtpCode.innerText = d.otp;
+                                    } else {
+                                        dom.testOtpCode.innerText = 'Error fetching OTP';
+                                    }
+                                }).catch(() => {
+                                    dom.testOtpCode.innerText = 'Error fetching OTP';
+                                });
+                        } else {
+                            dom.testBanner.style.display = 'none';
+                        }
                     } else {
                         showMsg(res.body.error, true);
                     }

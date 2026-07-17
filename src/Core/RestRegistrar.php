@@ -89,6 +89,14 @@ class RestRegistrar {
                 'callback' => [$this->authController, 'verify_otp'],
                 'permission_callback' => '__return_true'
             ]);
+
+            register_rest_route($namespace, '/admin/test-otp', [
+                'methods' => 'GET',
+                'callback' => [$this->authController, 'get_test_otp'],
+                'permission_callback' => function () {
+                    return current_user_can('manage_options');
+                }
+            ]);
         }
 
         // Patient Portal (Requires Bearer token)

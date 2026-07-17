@@ -16,6 +16,9 @@ class GetStartedPage {
                 } elseif (isset($_POST['create_demo_pages'])) {
                     $this->createDemoPages();
                     echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Demo pages created successfully.', 'allure-clinics') . '</p></div>';
+                } elseif (isset($_POST['cleanup_duplicate_leads'])) {
+                    $deleted = $this->cleanupDuplicateLeads();
+                    echo '<div class="notice notice-success is-dismissible"><p>' . sprintf(esc_html__('Cleanup complete: %d duplicate legacy leads removed.', 'allure-clinics'), $deleted) . '</p></div>';
                 }
             }
         }
@@ -44,6 +47,18 @@ class GetStartedPage {
         $portal_page = get_page_by_path('patient-portal');
         $contact_page = get_page_by_path('contact-us');
         $has_demo_pages = ($book_page && $portal_page && $contact_page);
+
+        // Check for duplicate legacy leads
+        global $wpdb;
+        $duplicate_count = $wpdb->get_var("
+            SELECT COUNT(*) FROM (
+                SELECT name, mobile, email, service_interest, message
+                FROM {$wpdb->prefix}ac_leads
+                GROUP BY name, mobile, email, service_interest, message
+                HAVING COUNT(*) > 1
+            ) as dupes
+        ");
+        $has_duplicates = ($duplicate_count > 0);
 
         include plugin_dir_path(__FILE__) . 'views/get-started.php';
     }
@@ -85,5 +100,41 @@ class GetStartedPage {
                 }
             }
         }
+    }
+
+    private function cleanupDuplicateLeads(): int {
+        global $wpdb;
+        $deleted_count = 0;
+
+        // Find groups of duplicates
+        $duplicates = $wpdb->get_results("
+            SELECT name, mobile, email, service_interest, message
+            FROM {$wpdb->prefix}ac_leads
+            GROUP BY name, mobile, email, service_interest, message
+            HAVING COUNT(*) > 1
+        ", ARRAY_A);
+
+        foreach ($duplicates as $group) {
+            // Find all IDs in this group, ordered by created_at ASC
+            $query = $wpdb->prepare("
+                SELECT id 
+                FROM {$wpdb->prefix}ac_leads 
+                WHERE name = %s AND mobile = %s AND email = %s AND service_interest = %s AND message = %s
+                ORDER BY created_at ASC
+            ", $group['name'], $group['mobile'], $group['email'], $group['service_interest'], $group['message']);
+            
+            $ids = $wpdb->get_col($query);
+
+            if (count($ids) > 1) {
+                // Keep the first one, delete the rest
+                array_shift($ids);
+                $ids_list = implode(',', array_map('intval', $ids));
+                
+                $wpdb->query("DELETE FROM {$wpdb->prefix}ac_leads WHERE id IN ($ids_list)");
+                $deleted_count += count($ids);
+            }
+        }
+
+        return $deleted_count;
     }
 }

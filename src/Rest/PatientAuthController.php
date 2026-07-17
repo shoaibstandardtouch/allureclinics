@@ -34,7 +34,12 @@ class PatientAuthController {
             return new WP_REST_Response(['error' => $result['message']], 429);
         }
 
-        return new WP_REST_Response(['message' => $result['message']], 200);
+        $test_mode = get_option('ac_sms_provider') === 'log_only';
+
+        return new WP_REST_Response([
+            'message' => $result['message'],
+            'test_mode' => $test_mode
+        ], 200);
     }
 
     /**
@@ -61,5 +66,29 @@ class PatientAuthController {
             'message' => 'Verified successfully',
             'session_token' => $token
         ], 200);
+    }
+
+    /**
+     * Get OTP for test mode
+     * GET /allure/v1/admin/test-otp?mobile={number}
+     */
+    public function get_test_otp(WP_REST_Request $request): WP_REST_Response {
+        if (get_option('ac_sms_provider') !== 'log_only') {
+            return new WP_REST_Response(['error' => 'Not in test mode'], 403);
+        }
+
+        $mobile = sanitize_text_field($request->get_param('mobile'));
+        if (empty($mobile)) {
+            return new WP_REST_Response(['error' => 'Mobile number is required'], 400);
+        }
+
+        $normalized_mobile = ltrim($mobile, '+');
+        $otp = get_transient('ac_test_otp_' . $normalized_mobile);
+
+        if (!$otp) {
+            return new WP_REST_Response(['error' => 'No OTP found or expired'], 404);
+        }
+
+        return new WP_REST_Response(['otp' => $otp], 200);
     }
 }
