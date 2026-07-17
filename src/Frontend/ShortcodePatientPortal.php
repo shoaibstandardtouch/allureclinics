@@ -306,7 +306,7 @@ class ShortcodePatientPortal {
                 fetch('<?php echo esc_url(rest_url('allure/v1/auth/otp/request')); ?>', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mobile: currentMobile })
+                    body: JSON.stringify({ mobile_number: currentMobile })
                 })
                 .then(res => res.json().then(data => ({status: res.status, body: data})))
                 .then(res => {
@@ -353,7 +353,7 @@ class ShortcodePatientPortal {
                 fetch('<?php echo esc_url(rest_url('allure/v1/auth/otp/verify')); ?>', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mobile: currentMobile, otp: otp })
+                    body: JSON.stringify({ mobile_number: currentMobile, otp: otp })
                 })
                 .then(res => res.json().then(data => ({status: res.status, body: data})))
                 .then(res => {
